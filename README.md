@@ -1,3 +1,156 @@
+Customization for successfull Carla Building Process in Docker for Custom Map Import
+==========================================================================================
+
+## Configuring Linux for ue4-docker
+-----------------------------------
+### Guide: 
+https://docs.adamrehn.com/ue4-docker/configuration/configuring-linux
+#### Dependencies:
+```
+sudo apt install python3 python3-dev python3-pip
+```
+#### Install ue4-docker Python Package
+```
+sudo pip3 install ue4-docker
+```
+#### Configure the Firewall (create firewall rule to permit access to port 9876
+```
+sudo ue4-docker setup
+```
+
+## Access Unreal Engine 4 C++ source code via GitHub
+----------------------------------------------------
+### Guide: 
+https://www.unrealengine.com/en-US/ue4-on-github
+##### Create | Login Github Account: 
+https://github.com/
+##### Create | Login UnrealEngine Account: 
+https://UnrealEngine.com
+##### Connect UnrealEngine Account with Github Account:   
+"User Name": Personal >> Connections >> Accounts >> Github: End User Licence Agreement for Publishing >> Authorize EpicGames
+##### Move to your E-Mail Address: 
+"Join @EpicGames"
+
+## Generate Github Authentication Token
+---------------------------------------
+### Guide: 
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+##### Login to Github:   
+Profile >> Developer Settings >> Personal access tokens >> Generate new token		
+##### Note: 
+Description what the Token is for
+
+## Clone Repo
+-------------
+#### Clone Repo:
+```
+git clone git@github.com:aufkeinenfallvergessen/carla.git <CARLA Source Code Repo>
+```	
+Original Repo: https://github.com/carla-simulator/carla
+#### Checkout into last released Version
+```
+cd <CARLA Source Code Repo>
+git checkout <latest CARLA Tag>
+```																
+
+## Adjust Docker Files
+------------------------------------
+### Guide: 
+https://github.com/carla-simulator/carla/issues/4862
+#### yBuildUtilsDocker.sh
+```
+cd /Util/Docker
+touch MyBuildUtilsDocker.sh
+cd ..
+cat BuildTools/BuildUtilsDocker.sh > Docker/MyBuildUtilsDocker.sh
+cd /Docker
+sudo geany MyBuildUtilsDocker.sh
+```
+##### Replace line 20:
+"wget -c "${FBXSDK_URL}" -P "${CARLA_DOCKER_UTILS_FOLDER}"
+##### with:
+"wget --user-agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:94.0) Gecko/20100101 Firefox/94.0" -c "${FBXSDK_URL}" -P "${CARLA_DOCKER_UTILS_FOLDER}"
+#### Prerequisites.Dockerfile
+##### Implementation of the required Github Authentication Token
+```
+sudo geany Prerequisites.Dockerfile
+```
+##### Replace line 50:
+"https://${EPIC_USER}:${EPIC_PASS}@github.com/CarlaUnreal/UnrealEngine.git"
+##### with:
+"https://<Github Token>@github.com/CarlaUnreal/UnrealEngine.git"
+#### Carla.Dockerfile
+```
+sudo geany Carla.Dockerfile
+```
+##### Replace all:
+```
+FROM carla-prerequisites:latest
+
+ARG GIT_BRANCH
+
+USER carla
+WORKDIR /home/carla
+
+RUN cd /home/carla/ && \
+  if [ -z ${GIT_BRANCH+x} ]; then git clone --depth 1 https://github.com/carla-simulator/carla.git; \
+  else git clone --depth 1 --branch $GIT_BRANCH https://github.com/carla-simulator/carla.git; fi && \
+  cd /home/carla/carla && \
+  ./Update.sh && \
+  make CarlaUE4Editor && \
+  make PythonAPI && \
+  make build.utils && \
+  make package && \
+  rm -r /home/carla/carla/Dist
+
+WORKDIR /home/carla/carla
+```
+with:
+```
+FROM carla-prerequisites:latest
+
+ARG GIT_BRANCH
+
+USER carla
+
+RUN cd /home/carla && \
+  if [ -z ${GIT_BRANCH+x} ]; then git clone --depth 1 https://github.com/carla-simulator/carla.git; \
+  else git clone --depth 1 --branch $GIT_BRANCH https://github.com/carla-simulator/carla.git; fi && \
+  cd /home/carla/carla && \
+  ./Update.sh && \
+  make CarlaUE4Editor && \
+  make PythonAPI
+WORKDIR /home/carla/carla
+COPY MyBuildUtilsDocker.sh .  
+RUN cat MyBuildUtilsDocker.sh > Util/BuildTools/BuildUtilsDocker.sh
+RUN make build.utils
+RUN make package
+RUN rm -r /home/carla/carla/Dist
+
+WORKDIR /home/carla/carla
+```
+
+## Building Docker Image
+------------------------
+### Guide: 
+https://github.com/carla-simulator/carla/tree/master/Util/Docker
+#### create a Docker image containing a compiled version of Unreal Engine 4
+##### Choose the latest released Unreal Engine Version: 
+https://github.com/EpicGames/UnrealEngine/releases?page=1
+```
+ue4-docker build <Version a.e.: 4.24.3> --no-engine --no-minimal
+```				
+##### Use Github Authentification Token as Password
+#### Build Image in Docker Container with all the necessary requisites to build Carla in Ubuntu 18.04
+```
+docker build -t carla-prerequisites -f Prerequisites.Dockerfile .
+```
+#### Create Carla image	
+```
+docker build -t carla -f Carla.Dockerfile . --build-arg GIT_BRANCH=<latest CARLA Tag>
+```
+
+
 CARLA Simulator
 ===============
 
