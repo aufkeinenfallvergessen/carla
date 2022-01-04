@@ -1,3 +1,4 @@
+### IGNORE 1st Level Directories
 Build
 Dist
 Doxygen
@@ -6,12 +7,8 @@ TrafficManager/build
 Util/Build
 Install
 Plugins
-!Unreal/CarlaUE4/Plugins
 
-/ExportedMaps
-/Import/*
-!/Import/README.md
-
+### IGNORE FILE TYPES
 *.VC.db
 *.VC.opendb
 *.a
@@ -30,6 +27,8 @@ Plugins
 *.stackdump
 *.sublime-workspace
 *.workspace
+
+### IGNORE SPECIFIC FILES
 *CodeCompletionFolders.txt
 *CodeLitePreProcessor.txt
 .aria2c.input
@@ -40,10 +39,47 @@ Plugins
 .tags*
 .vs
 .vscode
+profiler.csv
+
+### IGNORE UNSPECIFIED TYPES
 __pycache__
 _benchmarks_results
 _images*
 _out*
 _site
 core
-profiler.csv
+
+### UNREAL ENGINE
+# Dont Ignore Directories
+!Unreal/CarlaUE4/Plugins
+
+### EXPORT | IMPORT
+# Ingore Directories
+/ExportedMaps
+# Ignore Files in Directories
+/Import/*
+# Dont Ignore Files
+!/Import/README.md
+
+### ROADRUNNER
+# Ignore Directories
+/RoadRunner_Maps/Input_forBuild
+/RoadRunner_Maps/Output_fromBuild
+/RoadRunner_Maps/*/Exports
+# Ignore File Types
+/RoadRunner_Maps/**/*.rrmeta
+/RoadRunner_Maps/**/*.png_rrx
+/RoadRunner_Maps/**/*.fbx_rrx
+/RoadRunner_Maps/**/*.png
+/RoadRunner_Maps/**/*.fbx
+/RoadRunner_Maps/**/*.svg_rrx
+/RoadRunner_Maps/**/*.svg
+# Ignore Specific Files
+/RoadRunner_Maps/*/Project/Project.rrproj
+/RoadRunner_Maps/*/Project/SegmentationCategories.xml
+/RoadRunner_Maps/*/Scenes/FourWaySignal.rrscene
+/RoadRunner_Maps/*/Scenes/FourWayStop.rrscene
+/RoadRunner_Maps/*/Scenes/SanAntonio.rrscene
+/RoadRunner_Maps/*/Scenes/T_Intersection.rrscene
+# Dont Ignore Files in all Directories
+!*_CUSTOM.*

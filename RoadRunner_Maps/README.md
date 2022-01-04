@@ -47,10 +47,12 @@ Preparation for Building Custom Maps
 Has to be performed just once
 ```
 cd ~/<Dir in Home>/carla/carla_sourceCode/RoadRunner_Maps
+mkdir CarlaProjects
 mkdir Input_forBuild
 mkdir Output_fromBuild
-sudo chmod 777 Input_forBuild           # Give Directory all Permissions
-sudo chmod 777 Output_fromBuild         # Give Directory all Permissions
+sudo chmod 777 CarlaProjects            # Give Directory all Permissions
+sudo chmod 777 Input_forBuild           
+sudo chmod 777 Output_fromBuild
 ```
 
 Build Custom Map in RoadRunner
